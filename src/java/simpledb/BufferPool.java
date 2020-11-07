@@ -110,8 +110,8 @@ public class BufferPool {
 
 			if (numPages < DEFAULT_PAGES) {
 				queue.add(p); //// adding the page to the queue if there the page number is less to 50 size
-								//// given in the attribute
-								//// the buffer
+				//// given in the attribute
+				//// the buffer
 				return p;
 			} else {
 				evictPage(); // remove the head
@@ -122,6 +122,7 @@ public class BufferPool {
 			// 1- check if pid exist in the buffer. If it exists return it
 
 			// 2- If not exist, get its id and get its file from catalog
+
 			// 3- Use DbFile.readPage to read the page using pid
 
 		}
@@ -265,11 +266,6 @@ public class BufferPool {
 	 * dirty pages are updated on disk.
 	 */
 	private synchronized void evictPage() throws DbException {
-		// some code goes here
-		// not necessary for lab1
-		/*
-		 * flush a page to disk and remove it from buffer
-		 */
 		queue.remove();
 	}
 

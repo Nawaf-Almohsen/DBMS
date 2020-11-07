@@ -15,10 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @Threadsafe
  */
-public class Catalog {
+public  class Catalog {
 	// 1- create data structures to maintain mapping of id and name to table info.
 	// Table info include: DbFile, name and PKey
-	Map<String, DbFile> states = new HashMap<String, DbFile>();
 	
 	/**
 	 * Constructor. Creates a new, empty catalog.

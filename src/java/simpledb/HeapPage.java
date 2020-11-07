@@ -73,8 +73,7 @@ public class HeapPage implements Page {
 	private int getNumTuples() {
 		// some code goes here
 		// compute the number of tuples based on page size and tuple size
-		return 0;
-	
+		return ((BufferPool.getPageSize() * 8) / (td.getSize() * 8 + 1));
 
 	}
 
@@ -86,10 +85,11 @@ public class HeapPage implements Page {
 	 *         tuple occupying tupleSize bytes
 	 */
 	private int getHeaderSize() {
+		if ((getNumTuples() % 8 == 0)) {
+			return getNumTuples() / 8;
 
-		// some code goes here
-		// compute the header size. Be careful, division operation can be tricky.
-		return 0;
+		}
+		return ((getNumTuples() / 8) + 1);
 
 	}
 
@@ -122,8 +122,7 @@ public class HeapPage implements Page {
 	 */
 	public HeapPageId getId() {
 		// some code goes here
-	
-		 throw new UnsupportedOperationException("implement this");
+		return pid;
 	}
 
 	/**
@@ -257,11 +256,20 @@ public class HeapPage implements Page {
 	public void deleteTuple(Tuple t) throws DbException {
 		// some code goes here
 		// not necessary for lab1
+		int temp = -1;
+		for (int i = 0; i < tuples.length; i++)
+			if (tuples[i].getRecordId() == t.getRecordId())
+				temp = i;
+
+		if (temp == -1 || !isSlotUsed(temp))
+			throw new DbException("tuple not found / slot is empty");
+
+		markSlotUsed(temp, false);
+
 		/*
-		 * Check that pageId of tuple record id match
-		 * Loop array of tuples to find tuple with matching record id
-		 * check slot is used and mark it as not used
-		 * If tuple record id not exist or pagId not match, throw exception
+		 * Check that pageId of tuple record id match Loop array of tuples to find tuple
+		 * with matching record id check slot is used and mark it as not used If tuple
+		 * record id not exist or pagId not match, throw exception
 		 */
 	}
 
@@ -277,10 +285,9 @@ public class HeapPage implements Page {
 		// some code goes here
 		// not necessary for lab1
 		/*
-		 * Check that pageId of tuple record id match
-		 * Loop array of tuples to find empty slot
-		 * Set recordId to correspond to empty slot
-		 * If no empty slot or pagId not match, throw exception
+		 * Check that pageId of tuple record id match Loop array of tuples to find empty
+		 * slot Set recordId to correspond to empty slot If no empty slot or pagId not
+		 * match, throw exception
 		 */
 	}
 
@@ -291,7 +298,7 @@ public class HeapPage implements Page {
 	public void markDirty(boolean dirty, TransactionId tid) {
 		// some code goes here
 		// not necessary for lab1
-		//required fro lab2
+		// required fro lab2
 	}
 
 	/**
@@ -301,7 +308,7 @@ public class HeapPage implements Page {
 	public TransactionId isDirty() {
 		// some code goes here
 		// Not necessary for lab1
-		//required for lab2
+		// required for lab2
 		// if not dirty return null
 		return null;
 	}
@@ -315,14 +322,24 @@ public class HeapPage implements Page {
 		return 0;
 	}
 
+	private byte getBit(int position, byte b) {
+		return (byte) ((b >> position) & 1);
+	}
+
 	/**
 	 * Returns true if associated slot on this page is filled.
 	 */
 	public boolean isSlotUsed(int i) {
 		// some code goes here
-		// Each bit of the header array of bytes represent a slot. If bit=1, slot is used
+		// Each bit of the header array of bytes represent a slot. If bit=1, slot is
+		// used
 		// locate the correct bit and check if its 1. Search the Internet to know how.
-		
+		int nbyte = i / 8;
+		int nbit = i % 8;
+
+		if (getBit(nbit, header[nbyte]) == 1)
+			return true;
+
 		return false;
 	}
 
@@ -330,11 +347,28 @@ public class HeapPage implements Page {
 	 * Abstraction to fill or clear a slot on this page.
 	 */
 	private void markSlotUsed(int i, boolean value) {
+
+		if (value) {
+			if (isSlotUsed(i))
+				return;
+			int nbyte = i / 8;
+			int nbit = i % 8;
+			header[nbyte] += Math.pow(2, nbit);
+		} else {
+			if (!isSlotUsed(i))
+				return;
+
+			int nbyte = i / 8;
+			int nbit = i % 8;
+			header[nbyte] -= Math.pow(2, nbit);
+
+		}
+
 		// some code goes here
 		// not necessary for lab1
 		/*
-		 * find the corresponding byte in the header
-		 * set the corresponding bit of the byte in the header to value
+		 * find the corresponding byte in the header set the corresponding bit of the
+		 * byte in the header to value
 		 */
 	}
 
@@ -347,12 +381,11 @@ public class HeapPage implements Page {
 		// some code goes here
 		// return an iterator of tuples in used slots.
 		/*
-		 * create a list
-		 * add tuples of used slots to the list
-		 * return an iterator of the list
+		 * create a list add tuples of used slots to the list return an iterator of the
+		 * list
 		 */
-    	
-        return null;
+
+		return null;
 	}
 
 }
