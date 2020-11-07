@@ -18,11 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Catalog {
 	// 1- create data structures to maintain mapping of id and name to table info.
 	// Table info include: DbFile, name and PKey
+	Map<String, DbFile> states = new HashMap<String, DbFile>();
 	
 	/**
 	 * Constructor. Creates a new, empty catalog.
 	 */
+	
 	public Catalog() {
+
 		// some code goes here
 	}
 
@@ -40,7 +43,8 @@ public class Catalog {
 	 */
 	public void addTable(DbFile file, String name, String pkeyField) {
 		// some code goes here
-		// 1- add a table to the catalog	
+		// 1- add a table to the catalog
+		
 
 	}
 
