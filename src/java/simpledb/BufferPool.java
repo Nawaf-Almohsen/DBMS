@@ -116,14 +116,10 @@ public class BufferPool {
 			} else {
 				evictPage(); // remove the head
 				queue.add(p);
+				return p;
 			}
 
-			// some code goes here
-			// 1- check if pid exist in the buffer. If it exists return it
-
-			// 2- If not exist, get its id and get its file from catalog
-
-			// 3- Use DbFile.readPage to read the page using pid
+		
 
 		}
 		return null;

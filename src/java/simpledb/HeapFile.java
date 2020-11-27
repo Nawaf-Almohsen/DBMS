@@ -14,7 +14,10 @@ import java.util.*;
  * @author Sam Madden
  */
 public class HeapFile implements DbFile {
-   // create class attributes to maintain info of HeapFile
+	// create class attributes to maintain info of HeapFile
+	File f;
+	ArrayList<HeapPage> hp;
+	TupleDesc td;
 
 	/**
 	 * Constructs a heap file backed by the specified file.
@@ -24,11 +27,16 @@ public class HeapFile implements DbFile {
 	public HeapFile(File f, TupleDesc td) {
 		// some code goes here
 		/*
-		 * initialize HeapFile info
-		 * create PageIds based on the possible number of pages.
-		 * The number of pages must be computed based on file size and page size in bytes
+		 * 
+		 * initialize HeapFile info create PageIds based on the possible number of
+		 * pages. The number of pages must be computed based on file size and page size
+		 * in bytes
 		 */
-		
+
+		this.f = f;
+		this.td = td;
+		hp = new ArrayList<HeapPage>((int) f.getTotalSpace() / BufferPool.getPageSize());
+
 	}
 
 	/**
@@ -38,7 +46,7 @@ public class HeapFile implements DbFile {
 	 */
 	public File getFile() {
 		// some code goes here
-		return null;
+		return f;
 	}
 
 	/**
@@ -52,10 +60,10 @@ public class HeapFile implements DbFile {
 	 */
 	public int getId() {
 		// some code goes here
-		//suggest hashing the absolute file name of the file underlying
+		// suggest hashing the absolute file name of the file underlying
 		// the heapfile, i.e. f.getAbsoluteFile().hashCode()
-		
-		 throw new UnsupportedOperationException("implement this");
+
+		return f.getAbsoluteFile().hashCode();
 	}
 
 	/**
@@ -65,33 +73,37 @@ public class HeapFile implements DbFile {
 	 */
 	public TupleDesc getTupleDesc() {
 		// some code goes here
-		
-		 throw new UnsupportedOperationException("implement this");
+		return td;
+
 	}
 
 	// see DbFile.java for javadocs
 	public Page readPage(PageId pid) {
 		// some code goes here
 		/*
-		 * Check that the requested pid = the current file id
-		 * create empty buffer with HeapPage.createEmptyPageData();
-		 * Read the file with random access and seek to the specified location of pid
-		 * Fill the buffer and return a new page containing it.
+		 * Check that the requested pid = the current file id create empty buffer with
+		 * HeapPage.createEmptyPageData(); Read the file with random access and seek to
+		 * the specified location of pid Fill the buffer and return a new page
+		 * containing it.
 		 */
-		return null;
 		
+		for (int i = 0; i < hp.size(); i++) {
+			if (hp.get(i).pid == pid)
+				return hp.get(i);
+
+		}
+		return null;
+
 	}
 
 	// see DbFile.java for javadocs
 	public void writePage(Page page) throws IOException {
 		// some code goes here
 		// not necessary for lab1
-		//required fro lab2
+		// required fro lab2
 		/*
-		 * check if page is dirty
-		 * Open file with RandomAccessFile
-		 * skipBytes to the appropriate offset
-		 * Write pageData 
+		 * check if page is dirty Open file with RandomAccessFile skipBytes to the
+		 * appropriate offset Write pageData
 		 */
 	}
 
@@ -101,7 +113,7 @@ public class HeapFile implements DbFile {
 	public int numPages() {
 		// some code goes here
 		// return the computed number of pages for this file.
-		return 0;
+		return hp.size();
 
 	}
 
@@ -112,14 +124,11 @@ public class HeapFile implements DbFile {
 		return null;
 		// not necessary for lab1
 		/*
-		 * loop pageIds
-		 * Get page using Database.getBufferPool().getPage
-		 * Check for page with empty slots
-		 * insert tuple in the page
-		 * if no page with empty slots, create a new page
-		 * Add pageId of new page and increase the number of pages
-		 * insert the tuple in the page and write the page to disk
-		 * Return a list containing the page of inserted tuple
+		 * loop pageIds Get page using Database.getBufferPool().getPage Check for page
+		 * with empty slots insert tuple in the page if no page with empty slots, create
+		 * a new page Add pageId of new page and increase the number of pages insert the
+		 * tuple in the page and write the page to disk Return a list containing the
+		 * page of inserted tuple
 		 */
 	}
 
@@ -129,9 +138,8 @@ public class HeapFile implements DbFile {
 		return null;
 		// not necessary for lab1
 		/*
-		 * Get page of deleted tuple using Database.getBufferPool().getPage
-		 * delete tuple from page
-		 * return a list containing the page of deleted tuple
+		 * Get page of deleted tuple using Database.getBufferPool().getPage delete tuple
+		 * from page return a list containing the page of deleted tuple
 		 */
 	}
 
@@ -140,13 +148,18 @@ public class HeapFile implements DbFile {
 		// some code goes here
 		/*
 		 * 
-		 * read all pages using Database.getBufferPool().getPage
-		 * Use the iterator implemented in the pages to get all tuples
-		 * return an iterator that contain all tuples using DbFileIter as wrapper class
+		 * read all pages using Database.getBufferPool().getPage Use the iterator
+		 * implemented in the pages to get all tuples return an iterator that contain
+		 * all tuples using DbFileIter as wrapper class
 		 */
 		
-	
-		return null;
+		 
+         int columns =td.numFields();
+         DbFile table = Utility.openHeapFile(columns, f);
+         DbFileIterator it = table.iterator(tid);
+		
+
+		return it;
 	}
 
 }

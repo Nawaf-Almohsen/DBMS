@@ -1,6 +1,9 @@
 package simpledb;
 
 import java.util.*;
+
+import simpledb.TupleDesc.TDItem;
+
 import java.io.*;
 
 /**
@@ -121,7 +124,6 @@ public class HeapPage implements Page {
 	 * @return the PageId associated with this page.
 	 */
 	public HeapPageId getId() {
-		// some code goes here
 		return pid;
 	}
 
@@ -319,7 +321,13 @@ public class HeapPage implements Page {
 	public int getNumEmptySlots() {
 		// some code goes here
 		// use isSlotUsed() to compute the number of empty slots
-		return 0;
+		int curS = numSlots;
+		for (int i = 0; i < numSlots; i++) {
+			if (isSlotUsed(header[i]))
+				curS--;
+		}
+
+		return curS;
 	}
 
 	private byte getBit(int position, byte b) {
@@ -330,10 +338,7 @@ public class HeapPage implements Page {
 	 * Returns true if associated slot on this page is filled.
 	 */
 	public boolean isSlotUsed(int i) {
-		// some code goes here
-		// Each bit of the header array of bytes represent a slot. If bit=1, slot is
-		// used
-		// locate the correct bit and check if its 1. Search the Internet to know how.
+
 		int nbyte = i / 8;
 		int nbit = i % 8;
 
@@ -384,8 +389,27 @@ public class HeapPage implements Page {
 		 * create a list add tuples of used slots to the list return an iterator of the
 		 * list
 		 */
+		int cursize = 0;
+		for (int i = 0; i < numSlots; i++) {
+			if (isSlotUsed(i))
+				cursize++;
 
-		return null;
+		}
+
+		ArrayList<Tuple> curtup = new ArrayList<Tuple>(cursize);
+
+		int j = 0;
+		for (int i = 0; i < numSlots; i++) {
+			if (isSlotUsed(i)) {
+				curtup.add(tuples[i]);
+			}
+
+		}
+	
+		
+		
+		return curtup.iterator();
+
 	}
 
 }

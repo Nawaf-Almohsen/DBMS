@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 /**
  * The Catalog keeps track of all available tables in the database and their
  * associated schemas. For now, this is a stub catalog that must be populated
@@ -15,15 +17,35 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @Threadsafe
  */
-public  class Catalog {
+public class Catalog {
 	// 1- create data structures to maintain mapping of id and name to table info.
 	// Table info include: DbFile, name and PKey
-	
+
 	/**
 	 * Constructor. Creates a new, empty catalog.
 	 */
-	
+
+	private static class info {
+		DbFile file;
+		String name;
+		String pkey;
+		int fid;
+
+		info(DbFile file, String name, String pkey, int id) {
+			this.file = file;
+			this.name = name;
+			this.pkey = pkey;
+			this.fid = id;
+		}
+	}
+
+	HashMap<Integer, info> idToinfo;
+	HashMap<String, info> nameToinfo;
+	int counter=0;
 	public Catalog() {
+		idToinfo = new HashMap<Integer, info>();
+		nameToinfo = new HashMap<String, info>();
+
 
 		// some code goes here
 	}
@@ -36,14 +58,27 @@ public  class Catalog {
 	 *                  identfier of this file/tupledesc param for the calls
 	 *                  getTupleDesc and getFile
 	 * @param name      the name of the table -- may be an empty string. May not be
-	 *                  null. If a name conflict exists, use the last table to be
+	 *                  null. If a name conflict exip;sts, use the last table to be
 	 *                  added as the table for a given name.
 	 * @param pkeyField the name of the primary key field
 	 */
 	public void addTable(DbFile file, String name, String pkeyField) {
 		// some code goes here
-		// 1- add a table to the catalog
+		// 1- add a table to the catalog;
+		info inf = new info(file, name, pkeyField,file.getId());
 		
+		if(counter==0) {
+		idToinfo = new HashMap<Integer, info>();
+		nameToinfo = new HashMap<String, info>();
+		counter++;
+		}
+
+		idToinfo.put(file.getId(),inf);
+
+
+
+		nameToinfo.put(name, inf);
+
 
 	}
 
@@ -72,7 +107,10 @@ public  class Catalog {
 		// some code goes here
 		// get table file id from its name
 		// if id not exist in catalog, throw NoSuchElementException
-		return 0;
+		if (nameToinfo.get(name) == null)
+			throw new NoSuchElementException();
+
+		return nameToinfo.get(name).fid;
 	}
 
 	/**
@@ -85,8 +123,11 @@ public  class Catalog {
 	public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
 		// some code goes here
 		// return TupleDesc given tableid, throw exception if not exist
+		if (idToinfo.get(tableid) == null)
+			throw new NoSuchElementException();
 
-		return null;
+		return idToinfo.get(tableid).file.getTupleDesc();
+
 	}
 
 	/**
@@ -99,32 +140,39 @@ public  class Catalog {
 	public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
 		// some code goes here
 		// return file given tableid, throw exception if not exist
-
-		return null;
+		if(idToinfo.get(tableid) == null)
+			throw new NoSuchElementException();
+		return idToinfo.get(tableid).file;
 	}
 
 	public String getPrimaryKey(int tableid) {
 		// some code goes here
 		// return Pkey given tableid, throw exception if not exist
-		return null;
+		if(idToinfo.get(tableid) == null)
+			throw new NoSuchElementException();
+		return idToinfo.get(tableid).pkey;
 
 	}
 
 	public Iterator<Integer> tableIdIterator() {
 		// some code goes here
 		// return an iterator over all ids in catalog
-		return null;
+		return idToinfo.keySet().iterator();
 	}
 
 	public String getTableName(int id) {
-		// some code goes here
-		return null;
+		if(idToinfo.get(id) == null)
+			throw new NoSuchElementException();
+		return idToinfo.get(id).name;
 	}
 
 	/** Delete all tables from the catalog */
 	public void clear() {
 		// some code goes here
 		// clear the catalog
+		idToinfo=null;
+		nameToinfo=null;
+		
 	}
 
 	/**
